@@ -30,6 +30,11 @@ let shipBulletSoundPool = []; // Pool âm thanh để quản lý hiệu suất
 const MAX_SOUND_POOL_SIZE = 5; // Giảm kích thước pool để tránh quá tải
 let lastSoundPlayed = 0; // Dùng để hạn chế tần số phát âm thanh
 
+// Thêm biến âm thanh cho chiến thắng và thất bại
+let victorySound = null;
+let defeatSound = null;
+let hasPlayedEndSound = false; // Cờ để đảm bảo âm thanh chỉ phát một lần
+
 // Thêm biến để quản lý thời gian giữa các lần bắn
 let shootCooldown = 0;
 let shootCooldownTime = 15; // Thời gian chờ giữa các lần bắn (tính theo frame)
@@ -1419,6 +1424,48 @@ function showConfirmDialog(message, onConfirm, onCancel) {
     document.body.appendChild(modalBackdrop);
 }
 
+// Hàm phát âm thanh chiến thắng
+function playVictorySound() {
+    try {
+        if (!victorySound) {
+            victorySound = new Audio("./sounds/victory.mp4");
+            victorySound.volume = 0.7; // Âm lượng 70%
+        }
+
+        // Đảm bảo âm thanh chỉ phát một lần
+        if (!hasPlayedEndSound) {
+            victorySound.currentTime = 0;
+            victorySound.play().catch(error => {
+                console.error("Error playing victory sound:", error);
+            });
+            hasPlayedEndSound = true;
+        }
+    } catch (error) {
+        console.error("Error with victory sound:", error);
+    }
+}
+
+// Hàm phát âm thanh thất bại
+function playDefeatSound() {
+    try {
+        if (!defeatSound) {
+            defeatSound = new Audio("./sounds/defeat.mp4");
+            defeatSound.volume = 0.7; // Âm lượng 70%
+        }
+
+        // Đảm bảo âm thanh chỉ phát một lần
+        if (!hasPlayedEndSound) {
+            defeatSound.currentTime = 0;
+            defeatSound.play().catch(error => {
+                console.error("Error playing defeat sound:", error);
+            });
+            hasPlayedEndSound = true;
+        }
+    } catch (error) {
+        console.error("Error with defeat sound:", error);
+    }
+}
+
 window.onload = function () {
     try {
         board = document.getElementById("board");
@@ -1544,6 +1591,17 @@ window.onload = function () {
             sound.load(); // Tải âm thanh ngay lập tức
             shipBulletSoundPool.push(sound);
         }
+
+        // Preload âm thanh chiến thắng và thất bại
+        victorySound = new Audio("./sounds/victory.mp4");
+        defeatSound = new Audio("./sounds/defeat.mp4");
+
+        victorySound.volume = 0.7;
+        defeatSound.volume = 0.7;
+
+        // Preload để sẵn sàng phát ngay khi cần
+        victorySound.load();
+        defeatSound.load();
 
         console.log("Game initialized successfully");
 
@@ -1748,6 +1806,9 @@ function update() {
 
     // Xử lý màn hình game over trong chế độ single player
     if (gameOver && !aiEnabled) {
+        // Phát âm thanh thất bại
+        playDefeatSound();
+
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
 
@@ -1804,6 +1865,13 @@ function update() {
 
     // Xử lý màn hình kết quả versus khi có kết quả
     if (aiEnabled && (versusResult || gameOver)) {
+        // Phát âm thanh chiến thắng hoặc thất bại tùy theo kết quả
+        if (versusResult === "win") {
+            playVictorySound();
+        } else {
+            playDefeatSound();
+        }
+
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
 
@@ -1875,6 +1943,9 @@ function update() {
 
     // Hiển thị màn hình victory khi boss bị đánh bại trong chế độ single player
     if (bossDefeated && !aiEnabled) {
+        // Phát âm thanh chiến thắng
+        playVictorySound();
+
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
 
@@ -2249,14 +2320,17 @@ function update() {
                         if (aiShip.lives > 0) {
                             // AI vẫn còn sống, người chơi thua
                             versusResult = "lose";
+                            playDefeatSound();
                         } else {
                             // Cả hai đã bị tiêu diệt, so sánh điểm
                             versusResult = (score >= aiShip.score) ? "win" : "lose";
+                            versusResult === "win" ? playVictorySound() : playDefeatSound();
                         }
                     } else {
                         // Nếu ở chế độ single player
                         gameOver = true;
                         singlePlayerResult = "lose";
+                        playDefeatSound();
                     }
                     updateHighScores();
                 }
@@ -2279,9 +2353,11 @@ function update() {
                     if (lives > 0) {
                         // Người chơi vẫn còn sống, người chơi thắng
                         versusResult = "win";
+                        playVictorySound();
                     } else {
                         // Cả hai đã bị tiêu diệt, so sánh điểm
                         versusResult = (score >= aiShip.score) ? "win" : "lose";
+                        versusResult === "win" ? playVictorySound() : playDefeatSound();
                     }
                 }
             }
@@ -3131,6 +3207,9 @@ function resetGame() {
 
     // Reset sound pool
     shipBulletSoundPool = [];
+
+    // Reset biến trạng thái âm thanh kết thúc game
+    hasPlayedEndSound = false;
 }
 
 //thêm event listener cho phím R để restart game
@@ -3388,14 +3467,17 @@ function updateBossLasers() {
                         if (aiShip.lives > 0) {
                             // AI vẫn còn sống, người chơi thua
                             versusResult = "lose";
+                            playDefeatSound();
                         } else {
                             // Cả hai đã bị tiêu diệt, so sánh điểm
                             versusResult = (score >= aiShip.score) ? "win" : "lose";
+                            versusResult === "win" ? playVictorySound() : playDefeatSound();
                         }
                     } else {
                         // Nếu ở chế độ single player
                         gameOver = true;
                         singlePlayerResult = "lose";
+                        playDefeatSound();
                     }
                     updateHighScores();
                 }
@@ -3417,9 +3499,11 @@ function updateBossLasers() {
                     if (lives > 0) {
                         // Người chơi vẫn còn sống, người chơi thắng
                         versusResult = "win";
+                        playVictorySound();
                     } else {
                         // Cả hai đã bị tiêu diệt, so sánh điểm
                         versusResult = (score >= aiShip.score) ? "win" : "lose";
+                        versusResult === "win" ? playVictorySound() : playDefeatSound();
                     }
                 }
             }
