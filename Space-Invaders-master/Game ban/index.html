@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Shooter</title>
+    <!-- Thêm preload cho file âm thanh để cải thiện hiệu suất -->
+    <link rel="preload" href="./sounds/soundShip.mp4" as="audio">
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        canvas {
+            border: 3px solid white;
+            z-index: 10;
+            /* Đảm bảo canvas hiển thị trên cùng */
+            image-rendering: optimizeSpeed;
+            /* Cải thiện render */
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+
+        #board {
+            position: absolute;
+            z-index: 20;
+            /* Đảm bảo board có z-index cao nhất */
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="board"></canvas>
+    <script src="gamemode.js"></script>
+    <script src="space.js"></script>
+</body>
+
+</html>

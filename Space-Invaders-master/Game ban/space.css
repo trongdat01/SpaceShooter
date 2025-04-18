@@ -1,0 +1,32 @@
+body {
+    font-family:'Courier New', Courier, monospace;
+    text-align: center;
+    margin: 0;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+#container {
+    position: relative;
+    width: 1024px;
+    height: 640px;
+    margin: 0 auto;
+}
+
+#board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: black;
+}
+
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
