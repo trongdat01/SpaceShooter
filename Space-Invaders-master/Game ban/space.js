@@ -2338,14 +2338,12 @@ function update() {
     context.fillText("Score: " + score, 5, 20);
     context.fillText("Lives: " + lives, 5, 40);
     context.fillText("Shield: " + Math.floor(shield) + "%", 5, 60);
-    context.fillText("Level: " + level, 5, 80);
-    context.fillText("Bullets: " + permanentBulletCount, 5, 110);
+    context.fillText("Bullets: " + permanentBulletCount, 5, 80); // Moved up from position 110
 
-    // Vẽ thanh kinh nghiệm
-    context.fillStyle = "gray";
-    context.fillRect(5, 130, 150, 10);
-    context.fillStyle = "yellow";
-    context.fillRect(5, 130, (experiencePoints / experienceToNextLevel) * 150, 10);
+    // Hiển thị tên người chơi thay vì level và thanh kinh nghiệm
+    context.fillStyle = "#00ff00"; // Màu xanh lá cho tên người chơi
+    context.font = "bold 16px courier";
+    context.fillText("Player: " + playerName, 5, 110); // Thêm tên người chơi ở vị trí mới
 
     // Vẽ thông tin AI nếu đang ở chế độ versus
     if (aiEnabled) {
@@ -3159,10 +3157,26 @@ function levelUp() {
     bulletVelocityY -= 0.5;
     shieldRegenRate += 0.05;
 
-    // Hiệu ứng level up
-    context.fillStyle = "yellow";
-    context.font = "32px courier";
-    context.fillText("LEVEL UP!", boardWidth / 2 - 80, boardHeight / 2);
+    // Hiển thị thông báo level up nhỏ hơn và nhanh hơn
+    let levelUpText = document.createElement("div");
+    levelUpText.textContent = "LEVEL UP!";
+    levelUpText.style.position = "absolute";
+    levelUpText.style.color = "#ffff00";
+    levelUpText.style.fontFamily = "courier";
+    levelUpText.style.fontWeight = "bold";
+    levelUpText.style.fontSize = "24px";
+    levelUpText.style.top = "100px";
+    levelUpText.style.left = (boardWidth / 2 - 60) + "px";
+    levelUpText.style.zIndex = "1000";
+    levelUpText.style.textShadow = "0 0 5px #ff0000";
+    document.body.appendChild(levelUpText);
+
+    // Xóa thông báo sau 1 giây
+    setTimeout(() => {
+        if (levelUpText.parentNode) {
+            document.body.removeChild(levelUpText);
+        }
+    }, 1000);
 }
 
 // Ngăn chặn hành vi mặc định của phím Space
