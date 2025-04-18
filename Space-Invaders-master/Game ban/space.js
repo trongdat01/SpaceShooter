@@ -56,8 +56,9 @@ let alienVelocityX = 0.5;
 let bulletArray = [];
 let bulletVelocityY = -10;
 
-// Thêm biến âm thanh cho buff
+// Thêm biến âm thanh cho buff và warning
 let buffSound = null;
+let warningSound = null;
 
 //buff
 let buff = null;
@@ -1269,8 +1270,29 @@ function showInstructionsScreen() {
     document.body.appendChild(modalBackdrop);
 }
 
+// Hàm phát âm thanh cảnh báo
+function playWarningSound() {
+    try {
+        if (!warningSound) {
+            warningSound = new Audio("./sounds/warning.mp4");
+            warningSound.volume = 0.7; // Âm lượng 70%
+        }
+
+        // Reset và phát âm thanh
+        warningSound.currentTime = 0;
+        warningSound.play().catch(error => {
+            console.error("Error playing warning sound:", error);
+        });
+    } catch (error) {
+        console.error("Error with warning sound:", error);
+    }
+}
+
 // Thêm hàm flashWarning cho boss lasers
 function flashWarning() {
+    // Phát âm thanh cảnh báo
+    playWarningSound();
+
     // Hiệu ứng nhấp nháy cảnh báo khi boss sắp bắn laser
     let warningFlash = document.createElement("div");
     warningFlash.style.position = "fixed";
@@ -1613,19 +1635,22 @@ window.onload = function () {
             shipBulletSoundPool.push(sound);
         }
 
-        // Preload âm thanh chiến thắng, thất bại và buff
+        // Preload tất cả âm thanh
         victorySound = new Audio("./sounds/victory.mp4");
         defeatSound = new Audio("./sounds/defeat.mp4");
         buffSound = new Audio("./sounds/buff.mp4");
+        warningSound = new Audio("./sounds/warning.mp4");
 
         victorySound.volume = 0.7;
         defeatSound.volume = 0.7;
         buffSound.volume = 0.6;
+        warningSound.volume = 0.7;
 
         // Preload để sẵn sàng phát ngay khi cần
         victorySound.load();
         defeatSound.load();
         buffSound.load();
+        warningSound.load();
 
         console.log("Game initialized successfully");
 
