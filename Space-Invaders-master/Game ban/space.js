@@ -56,6 +56,9 @@ let alienVelocityX = 0.5;
 let bulletArray = [];
 let bulletVelocityY = -10;
 
+// Thêm biến âm thanh cho buff
+let buffSound = null;
+
 //buff
 let buff = null;
 let buffVelocityY = 2;
@@ -1466,6 +1469,24 @@ function playDefeatSound() {
     }
 }
 
+// Hàm phát âm thanh buff
+function playBuffSound() {
+    try {
+        if (!buffSound) {
+            buffSound = new Audio("./sounds/buff.mp4");
+            buffSound.volume = 0.6; // Âm lượng 60%
+        }
+
+        // Reset và phát âm thanh
+        buffSound.currentTime = 0;
+        buffSound.play().catch(error => {
+            console.error("Error playing buff sound:", error);
+        });
+    } catch (error) {
+        console.error("Error with buff sound:", error);
+    }
+}
+
 window.onload = function () {
     try {
         board = document.getElementById("board");
@@ -1592,16 +1613,19 @@ window.onload = function () {
             shipBulletSoundPool.push(sound);
         }
 
-        // Preload âm thanh chiến thắng và thất bại
+        // Preload âm thanh chiến thắng, thất bại và buff
         victorySound = new Audio("./sounds/victory.mp4");
         defeatSound = new Audio("./sounds/defeat.mp4");
+        buffSound = new Audio("./sounds/buff.mp4");
 
         victorySound.volume = 0.7;
         defeatSound.volume = 0.7;
+        buffSound.volume = 0.6;
 
         // Preload để sẵn sàng phát ngay khi cần
         victorySound.load();
         defeatSound.load();
+        buffSound.load();
 
         console.log("Game initialized successfully");
 
@@ -2653,6 +2677,11 @@ function activateBuff(targetShip) {
 
     // Xác định xem đây là tàu người chơi hay AI
     const isPlayerShip = (targetShip === ship);
+
+    // Phát âm thanh khi người chơi nhận buff (không phát cho AI)
+    if (isPlayerShip) {
+        playBuffSound();
+    }
 
     buff = null;
 
