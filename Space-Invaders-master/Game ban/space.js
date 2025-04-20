@@ -3290,20 +3290,6 @@ function levelUp() {
     bulletVelocityY -= 0.5;
     shieldRegenRate += 0.05;
 
-    // Hiển thị thông báo level up nhỏ hơn và nhanh hơn
-    let levelUpText = document.createElement("div");
-    levelUpText.textContent = "LEVEL UP!";
-    levelUpText.style.position = "absolute";
-    levelUpText.style.color = "#ffff00";
-    levelUpText.style.fontFamily = "courier";
-    levelUpText.style.fontWeight = "bold";
-    levelUpText.style.fontSize = "24px";
-    levelUpText.style.top = "100px";
-    levelUpText.style.left = (boardWidth / 2 - 60) + "px";
-    levelUpText.style.zIndex = "1000";
-    levelUpText.style.textShadow = "0 0 5px #ff0000";
-    document.body.appendChild(levelUpText);
-
     // Xóa thông báo sau 1 giây
     setTimeout(() => {
         if (levelUpText.parentNode) {
